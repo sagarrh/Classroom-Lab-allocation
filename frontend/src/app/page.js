@@ -2,7 +2,7 @@ import FloorLayout from "./FloorLayout";
 
 export default function Home() {
   return (
-    <div>
+    <div suppressHydrationWarning>
       <FloorLayout/>
     </div>
   );
