@@ -2,8 +2,8 @@ import React from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
 const givemedetails = (bookingId) => {
     const supabase = SupabaseClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_API_KEY
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_API_KEY
     );
     const { data, error } = supabase
         .from('bookings')
