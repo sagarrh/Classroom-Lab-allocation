@@ -127,20 +127,22 @@ export default function TimeSlots({ roomId, selectedDate }) {
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {generateTimeSlots().map((slot) => {
                         const status = isBooked(slot);
                         return (
                             <div
                                 key={slot}
                                 onClick={() => handleBooking(slot)}
-                                className={`p-3 border rounded-lg cursor-pointer hover:opacity-80 ${
+                                className={`p-4 border rounded-lg cursor-pointer hover:opacity-80 ${
                                     status === "approved"
                                         ? "bg-green-300"
                                         : status === "pending"
                                         ? "bg-yellow-300"
+                                        : status === "occupied"
+                                        ? "bg-red-300"
                                         : "bg-gray-200"
-                                }`}
+                                } flex flex-col justify-center items-center text-center`}
                             >
                                 <p className="font-semibold">{slot}</p>
                                 <p>
@@ -151,6 +153,8 @@ export default function TimeSlots({ roomId, selectedDate }) {
                                                 ? "text-green-700"
                                                 : status === "pending"
                                                 ? "text-yellow-700"
+                                                : status === "occupied"
+                                                ? "text-red-700"
                                                 : "text-gray-700"
                                         }`}
                                     >
@@ -161,7 +165,10 @@ export default function TimeSlots({ roomId, selectedDate }) {
                         );
                     })}
                 </div>
+                
             )}
+            
         </div>
     );
+    
 }

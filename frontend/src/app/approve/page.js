@@ -3,11 +3,13 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation"; // If using React Router
 
+// Initialize Supabase client outside of the component
+const supabase = new SupabaseClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_API_KEY
+);
+
 function ApproveBooking() {
-    const supabase = new SupabaseClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_API_KEY
-    );
   const [message, setMessage] = useState("");
   const searchParams = useSearchParams();
   
@@ -21,15 +23,22 @@ function ApproveBooking() {
         return;
       }
 
-      const { error } = await supabase
-        .from("bookings")
-        .update({ status: action, approved_by: "hod@example.com" })
-        .eq("id", bookingId);
+      try {
+        const { error } = await supabase
+          .from("bookings")
+          .update({
+            status: action,
+            approved_by: "hod@example.com"  // Ideally, replace this with dynamic user info
+          })
+          .eq("id", bookingId);
 
-      if (error) {
-        setMessage("Error updating booking: " + error.message);
-      } else {
-        setMessage(`Booking ${action === "approve" ? "approved" : "rejected"} successfully!`);
+        if (error) {
+          setMessage("Error updating booking: " + error.message);
+        } else {
+          setMessage(`Booking ${action === "approve" ? "approved" : "rejected"} successfully!`);
+        }
+      } catch (err) {
+        setMessage("Network error: " + err.message);
       }
     }
 

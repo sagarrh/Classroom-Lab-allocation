@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Stage, Layer, Rect, Text, Group, Line } from 'react-konva';
 import { useRouter } from 'next/navigation'
+import { ArrowRightIcon } from "@heroicons/react/24/solid";
 
 const FloorLayout = () => {
     const router = useRouter()
@@ -25,10 +26,6 @@ const FloorLayout = () => {
     // Define corridor
     const corridors = [
         { x: 250, y: 40, width: 30, height: 420 }, // Main corridor
-        { x: 40, y: 175, width: 210, height: 30 }, // Horizontal corridor for classrooms
-        { x: 280, y: 150, width: 280, height: 20 }, // Horizontal corridor for labs
-        { x: 280, y: 270, width: 280, height: 20 }, // Horizontal corridor for labs
-        { x: 280, y: 390, width: 280, height: 20 }, // Horizontal corridor for labs
     ];
 
     // Define classroom and lab positions and dimensions
@@ -70,7 +67,7 @@ const FloorLayout = () => {
     return (
         <>
         <div>
-            <h2>Building Floor Plan</h2>
+        <h1 className="font-bold text-4xl font-[Inter]">IT Department Floor Layout</h1>
             <Stage width={600} height={500}>
                    <Layer>
                     {/* Building outline */}
@@ -159,7 +156,16 @@ const FloorLayout = () => {
                 )}       
             </div>
             
-            <button onClick={() => router.push(`/time?roomId=${selectedRoom.id}`)}>next</button>
+            <button 
+            onClick={() => router.push(`/time?roomId=${selectedRoom?.id}`)} 
+            className="mt-4 px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold flex items-center justify-center gap-3 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!selectedRoom}
+            >
+            Next <ArrowRightIcon className="w-4 h-4" />
+            </button>
+
+
+
 
             
         </div>                                    
