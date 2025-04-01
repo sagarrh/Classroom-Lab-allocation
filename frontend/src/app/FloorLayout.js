@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { Stage, Layer, Rect, Text, Group, Line } from 'react-konva';
+import { Stage, Layer, Rect, Text, Group } from 'react-konva';
 import { useRouter } from 'next/navigation';
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { motion } from 'framer-motion';
@@ -10,8 +10,8 @@ const FloorLayout = () => {
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [hoveredRoom, setHoveredRoom] = useState(null);
 
-    // Building outline
-    const buildingOutline = { x: 40, y: 40, width: 520, height: 420 };
+    // Adjusted building dimensions for better proportions
+    const buildingOutline = { x: 50, y: 50, width: 750, height: 600 };
     
     // Pastel color palette
     const colors = {
@@ -21,30 +21,100 @@ const FloorLayout = () => {
         hover: '#E2F0CB',
         classroom: '#FFDAC1',
         lab: '#C7CEEA',
-        door: '#A5A5A5',
         text: '#2D3748',
         corridor: '#F8EDEB',
         accent: '#FF9AA2',
         background: '#F9F9F9'
     };
 
-    // Define corridor
+    // Define corridor (centered vertically)
+    const corridorWidth = 40;
+    const corridorX = buildingOutline.width/2 - corridorWidth/2 + buildingOutline.x;
     const corridors = [
-        { x: 250, y: 40, width: 30, height: 420 }, // Main corridor
+        { 
+            x: corridorX, 
+            y: buildingOutline.y, 
+            width: corridorWidth, 
+            height: buildingOutline.height 
+        },
     ];
 
-    // Define rooms
+    // Room dimensions and positions
+    const roomWidth = 200;
+    const roomHeight = 120;
+    const labWidth = 200;
+    const labHeight = 100;
+    const gap = 30; // Uniform gap between rooms and corridor
+
+    // Define classrooms (left side of corridor)
     const classrooms = [
-        { id: '66', x: 60, y: 60, width: 170, height: 100, label: 'Room 66', type: 'classroom', door: { x: 155, y: 160 } },
-        { id: '65', x: 60, y: 220, width: 170, height: 100, label: 'Room 65', type: 'classroom', door: { x: 155, y: 220 } },
-        { id: '64', x: 60, y: 340, width: 170, height: 100, label: 'Room 64', type: 'classroom', door: { x: 155, y: 340 } },
+        { 
+            id: '66', 
+            x: corridorX - gap - roomWidth, 
+            y: buildingOutline.y + 80, 
+            width: roomWidth, 
+            height: roomHeight, 
+            label: 'Room 66', 
+            type: 'classroom'
+        },
+        { 
+            id: '65', 
+            x: corridorX - gap - roomWidth, 
+            y: buildingOutline.y + 250, 
+            width: roomWidth, 
+            height: roomHeight, 
+            label: 'Room 65', 
+            type: 'classroom'
+        },
+        { 
+            id: '64', 
+            x: corridorX - gap - roomWidth, 
+            y: buildingOutline.y + 420, 
+            width: roomWidth, 
+            height: roomHeight, 
+            label: 'Room 64', 
+            type: 'classroom'
+        },
     ];
     
+    // Define labs (right side of corridor)
     const labs = [
-        { id: 'lab-3', x: 300, y: 60, width: 170, height: 75, label: 'Lab 3', type: 'lab', door: { x: 330, y: 150 } },
-        { id: 'lab-2', x: 300, y: 170, width: 170, height: 85, label: 'Lab 2', type: 'lab', door: { x: 330, y: 170 } },
-        { id: 'lab-1', x: 300, y: 290, width: 170, height: 85, label: 'Lab 1', type: 'lab', door: { x: 330, y: 290 } },
-        { id: 'HOD Cabin', x: 350, y: 410, width: 120, height: 30, label: 'HOD Cabin', type: 'office', door: { x: 330, y: 410 } },
+        { 
+            id: 'lab-3', 
+            x: corridorX + corridorWidth + gap, 
+            y: buildingOutline.y + 80, 
+            width: labWidth, 
+            height: labHeight, 
+            label: 'Lab 3', 
+            type: 'lab'
+        },
+        { 
+            id: 'lab-2', 
+            x: corridorX + corridorWidth + gap, 
+            y: buildingOutline.y + 220, 
+            width: labWidth, 
+            height: labHeight, 
+            label: 'Lab 2', 
+            type: 'lab'
+        },
+        { 
+            id: 'lab-1', 
+            x: corridorX + corridorWidth + gap, 
+            y: buildingOutline.y + 360, 
+            width: labWidth, 
+            height: labHeight, 
+            label: 'Lab 1', 
+            type: 'lab'
+        },
+        { 
+            id: 'HOD Cabin', 
+            x: corridorX + corridorWidth + gap, 
+            y: buildingOutline.y + 500, 
+            width: 150, 
+            height: 80, 
+            label: 'HOD Cabin', 
+            type: 'office'
+        },
     ];
 
     const allRooms = [...classrooms, ...labs];
@@ -59,27 +129,6 @@ const FloorLayout = () => {
 
     const handleRoomLeave = () => {
         setHoveredRoom(null);
-    };
-
-    const renderDoor = (door) => {
-        const doorLength = 20;
-        let points = [];
-        
-        if (door.direction === 'bottom') {
-            points = [door.x - doorLength/2, door.y, door.x + doorLength/2, door.y, door.x + doorLength/2, door.y + 5, door.x - doorLength/2, door.y + 5];
-        } else if (door.direction === 'top') {
-            points = [door.x - doorLength/2, door.y, door.x + doorLength/2, door.y, door.x + doorLength/2, door.y - 5, door.x - doorLength/2, door.y - 5];
-        }
-        
-        return (
-            <Line 
-                points={points} 
-                stroke={colors.door} 
-                strokeWidth={1.5} 
-                lineCap="round"
-                lineJoin="round"
-            />
-        );
     };
 
     const getRoomColor = (room) => {
@@ -97,7 +146,7 @@ const FloorLayout = () => {
             className="min-h-screen py-8 px-4 sm:px-6 lg:px-8"
             style={{ backgroundColor: colors.background }}
         >
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
                 <motion.div
                     initial={{ y: -20 }}
                     animate={{ y: 0 }}
@@ -114,9 +163,9 @@ const FloorLayout = () => {
 
                 <motion.div 
                     whileHover={{ scale: 1.01 }}
-                    className="bg-white rounded-xl shadow-lg p-4 mb-8"
+                    className="bg-white rounded-xl shadow-lg p-6 mb-8 overflow-auto"
                 >
-                    <Stage width={600} height={500}>
+                    <Stage width={850} height={700}>
                         <Layer>
                             {/* Building outline */}
                             <Rect
@@ -128,6 +177,9 @@ const FloorLayout = () => {
                                 strokeWidth={4}
                                 fill={colors.floor}
                                 cornerRadius={10}
+                                shadowColor="#00000020"
+                                shadowBlur={10}
+                                shadowOffset={{ x: 2, y: 2 }}
                             />
 
                             {/* Corridors */}
@@ -175,7 +227,6 @@ const FloorLayout = () => {
                                         fill={colors.text}
                                         fontStyle={selectedRoom && selectedRoom.id === room.id ? 'bold' : 'normal'}
                                     />
-                                    {room.door && renderDoor(room.door, room)}
                                 </Group>
                             ))}
                         </Layer>
