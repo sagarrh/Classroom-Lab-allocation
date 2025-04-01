@@ -12,7 +12,7 @@ export async function GET(req) {
 
     const newStatus = action === "approve" ? "approved" : "rejected";
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("bookings")
       .update({ status: newStatus })
       .eq("id", booking_id);
