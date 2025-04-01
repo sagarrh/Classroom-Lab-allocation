@@ -1,9 +1,9 @@
 "use client";
 import { createClient } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation"; 
 
-function ApproveBooking() {
+function ApproveBookingComponent() {
   const [message, setMessage] = useState("");
   const searchParams = useSearchParams();
   
@@ -47,4 +47,10 @@ function ApproveBooking() {
   return <h1>{message}</h1>;
 }
 
-export default ApproveBooking;
+export default function ApproveBooking() {
+  return (
+    <Suspense fallback={<h1>Loading...</h1>}>
+      <ApproveBookingComponent />
+    </Suspense>
+  );
+}
