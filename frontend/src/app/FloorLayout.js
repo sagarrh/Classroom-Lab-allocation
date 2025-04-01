@@ -11,7 +11,7 @@ const FloorLayout = () => {
     const [hoveredRoom, setHoveredRoom] = useState(null);
 
     // Adjusted building dimensions for better proportions
-    const buildingOutline = { x: 100, y: 45, width: 750, height: 600 };
+    const buildingOutline = { x: 55, y: 45, width: 750, height: 600 };
     
     // Pastel color palette
     const colors = {
@@ -149,7 +149,7 @@ const FloorLayout = () => {
             className="min-h-screen py-8 px-4 sm:px-6 lg:px-8"
             style={{ backgroundColor: colors.background }}
         >
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-6xl mx-auto">
                 <motion.div
                     initial={{ y: -20 }}
                     animate={{ y: 0 }}
@@ -164,119 +164,124 @@ const FloorLayout = () => {
                     </p>
                 </motion.div>
 
-                <motion.div 
-                    whileHover={{ scale: 1.01 }}
-                    className="bg-white rounded-xl shadow-lg p-6 mb-8 overflow-auto"
-                >
-                    <Stage width={850} height={700}>
-                        <Layer>
-                            {/* Building outline */}
-                            <Rect
-                                x={buildingOutline.x}
-                                y={buildingOutline.y}
-                                width={buildingOutline.width}
-                                height={buildingOutline.height}
-                                stroke={colors.wall}
-                                strokeWidth={4}
-                                fill={colors.floor}
-                                cornerRadius={10}
-                                shadowColor="#00000020"
-                                shadowBlur={10}
-                                shadowOffset={{ x: 2, y: 2 }}
-                            />
-
-                            {/* Corridors */}
-                            {corridors.map((corridor, index) => (
-                                <Rect
-                                    key={`corridor-${index}`}
-                                    x={corridor.x}
-                                    y={corridor.y}
-                                    width={corridor.width}
-                                    height={corridor.height}
-                                    fill={colors.corridor}
-                                    stroke={colors.wall}
-                                    strokeWidth={1}
-                                />
-                            ))}
-
-                            {/* Rooms */}
-                            {allRooms.map((room) => (
-                                <Group 
-                                    key={room.id} 
-                                    onClick={() => handleRoomClick(room)}
-                                    onMouseEnter={() => handleRoomHover(room)}
-                                    onMouseLeave={handleRoomLeave}
-                                >
-                                    <Rect
-                                        x={room.x}
-                                        y={room.y}
-                                        width={room.width}
-                                        height={room.height}
-                                        fill={getRoomColor(room)}
-                                        stroke={colors.wall}
-                                        strokeWidth={1.5}
-                                        cornerRadius={5}
-                                        shadowColor="#00000020"
-                                        shadowBlur={hoveredRoom && hoveredRoom.id === room.id ? 10 : 5}
-                                        shadowOpacity={0.3}
-                                        shadowOffset={{ x: 2, y: 2 }}
-                                    />
-                                    <Text
-                                        text={room.label}
-                                        x={room.x + room.width/2 - (room.label.length * 4)}
-                                        y={room.y + room.height/2 - 8}
-                                        fontSize={14}
-                                        fontFamily="Inter"
-                                        fill={colors.text}
-                                        fontStyle={selectedRoom && selectedRoom.id === room.id ? 'bold' : 'normal'}
-                                    />
-                                </Group>
-                            ))}
-                        </Layer>
-                    </Stage>
-                </motion.div>
-
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                >
-                    <div className="bg-white rounded-xl shadow-md p-6">
-                        <h3 className="text-xl font-semibold text-[#6D6875] mb-4">Selected Room Details</h3>
-                        {selectedRoom ? (
-                            <div className="space-y-3">
-                                <div className="flex items-center">
-                                    <div className="w-3 h-3 rounded-full mr-2" 
-                                         style={{ 
-                                             backgroundColor: selectedRoom.type === 'lab' ? colors.lab : 
-                                                            selectedRoom.type === 'office' ? colors.accent : colors.classroom 
-                                         }} 
-                                    />
-                                    <p className="text-lg font-medium">{selectedRoom.label}</p>
-                                </div>
-                                <p className="text-gray-600">Room ID: {selectedRoom.id}</p>
-                                <p className="text-gray-600 capitalize">Type: {selectedRoom.type}</p>
-                            </div>
-                        ) : (
-                            <p className="text-gray-500 italic">Click on a room to see details</p>
-                        )}
-                    </div>
-
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Left side - Floor Layout */}
                     <motion.div 
-                        whileHover={{ scale: 1.02 }}
-                        className="flex items-center justify-center"
+                        whileHover={{ scale: 1.01 }}
+                        className="bg-white rounded-xl shadow-lg p-6 flex-1"
                     >
-                        <button 
-                            onClick={() => router.push(`/time?roomId=${selectedRoom?.id}`)} 
-                            className="w-full px-8 py-4 bg-gradient-to-r from-[#B5EAD7] to-[#C7CEEA] text-[#2D3748] font-semibold flex items-center justify-center gap-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={!selectedRoom}
-                        >
-                            <span>Check Availability</span>
-                            <ArrowRightIcon className="w-5 h-5" />
-                        </button>
+                        <Stage width={850} height={700}>
+                            <Layer>
+                                {/* Building outline */}
+                                <Rect
+                                    x={buildingOutline.x}
+                                    y={buildingOutline.y}
+                                    width={buildingOutline.width}
+                                    height={buildingOutline.height}
+                                    stroke={colors.wall}
+                                    strokeWidth={4}
+                                    fill={colors.floor}
+                                    cornerRadius={10}
+                                    shadowColor="#00000020"
+                                    shadowBlur={10}
+                                    shadowOffset={{ x: 2, y: 2 }}
+                                />
+
+                                {/* Corridors */}
+                                {corridors.map((corridor, index) => (
+                                    <Rect
+                                        key={`corridor-${index}`}
+                                        x={corridor.x}
+                                        y={corridor.y}
+                                        width={corridor.width}
+                                        height={corridor.height}
+                                        fill={colors.corridor}
+                                        stroke={colors.wall}
+                                        strokeWidth={1}
+                                    />
+                                ))}
+
+                                {/* Rooms */}
+                                {allRooms.map((room) => (
+                                    <Group 
+                                        key={room.id} 
+                                        onClick={() => handleRoomClick(room)}
+                                        onMouseEnter={() => handleRoomHover(room)}
+                                        onMouseLeave={handleRoomLeave}
+                                    >
+                                        <Rect
+                                            x={room.x}
+                                            y={room.y}
+                                            width={room.width}
+                                            height={room.height}
+                                            fill={getRoomColor(room)}
+                                            stroke={colors.wall}
+                                            strokeWidth={1.5}
+                                            cornerRadius={5}
+                                            shadowColor="#00000020"
+                                            shadowBlur={hoveredRoom && hoveredRoom.id === room.id ? 10 : 5}
+                                            shadowOpacity={0.3}
+                                            shadowOffset={{ x: 2, y: 2 }}
+                                        />
+                                        <Text
+                                            text={room.label}
+                                            x={room.x + room.width/2 - (room.label.length * 4)}
+                                            y={room.y + room.height/2 - 8}
+                                            fontSize={14}
+                                            fontFamily="Inter"
+                                            fill={colors.text}
+                                            fontStyle={selectedRoom && selectedRoom.id === room.id ? 'bold' : 'normal'}
+                                        />
+                                    </Group>
+                                ))}
+                            </Layer>
+                        </Stage>
                     </motion.div>
-                </motion.div>
+
+                    {/* Right side - Details and Button */}
+                    <div className="flex-1 max-w-md lg:max-w-full">
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="space-y-6"
+                        >
+                            <div className="bg-white rounded-xl shadow-md p-6 h-fit">
+                                <h3 className="text-xl font-semibold text-[#6D6875] mb-4">Selected Room Details</h3>
+                                {selectedRoom ? (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center">
+                                            <div className="w-3 h-3 rounded-full mr-2" 
+                                                style={{ 
+                                                    backgroundColor: selectedRoom.type === 'lab' ? colors.lab : 
+                                                                    selectedRoom.type === 'office' ? colors.accent : colors.classroom 
+                                                }} 
+                                            />
+                                            <p className="text-lg font-medium">{selectedRoom.label}</p>
+                                        </div>
+                                        <p className="text-gray-600 capitalize">Type: {selectedRoom.type}</p>
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-500 italic">Click on a room to see details</p>
+                                )}
+                            </div>
+
+                            <motion.div 
+                                whileHover={{ scale: 1.02 }}
+                                className="flex items-center justify-center"
+                            >
+                                <button 
+                                    onClick={() => router.push(`/time?roomId=${selectedRoom?.id}`)} 
+                                    className="w-full px-8 py-4 bg-gradient-to-r from-[#B5EAD7] to-[#C7CEEA] text-[#2D3748] font-semibold flex items-center justify-center gap-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!selectedRoom}
+                                >
+                                    <span>Check Availability</span>
+                                    <ArrowRightIcon className="w-5 h-5" />
+                                </button>
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                </div>
 
                 <motion.div 
                     initial={{ opacity: 0 }}
