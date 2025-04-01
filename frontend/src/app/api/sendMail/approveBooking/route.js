@@ -1,4 +1,4 @@
-import { supabase } from "@/utils/supabaseClient";
+import { supabaseURL, supabasekey } from "@/utils/supabaseClient";
 
 export async function GET(req) {
   try {
@@ -11,7 +11,7 @@ export async function GET(req) {
     }
 
     const newStatus = action === "approve" ? "approved" : "rejected";
-
+    const supabase = createClient(supabaseURL, supabasekey);
     const { error } = await supabase
       .from("bookings")
       .update({ status: newStatus })
