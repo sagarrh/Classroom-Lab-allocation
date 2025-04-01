@@ -11,7 +11,7 @@ const FloorLayout = () => {
     const [hoveredRoom, setHoveredRoom] = useState(null);
 
     // Adjusted building dimensions for better proportions
-    const buildingOutline = { x: 50, y: 50, width: 750, height: 600 };
+    const buildingOutline = { x: 100, y: 45, width: 750, height: 600 };
     
     // Pastel color palette
     const colors = {
@@ -28,7 +28,7 @@ const FloorLayout = () => {
     };
 
     // Define corridor (centered vertically)
-    const corridorWidth = 40;
+    const corridorWidth = 60;
     const corridorX = buildingOutline.width/2 - corridorWidth/2 + buildingOutline.x;
     const corridors = [
         { 
@@ -120,11 +120,14 @@ const FloorLayout = () => {
     const allRooms = [...classrooms, ...labs];
 
     const handleRoomClick = (room) => {
+        if (room.id === 'HOD Cabin') return;
         setSelectedRoom(room);
     };
 
     const handleRoomHover = (room) => {
-        setHoveredRoom(room);
+        if (room.type !== 'office') { // Disable hover for HOD Cabin
+            setHoveredRoom(room);
+        }
     };
 
     const handleRoomLeave = () => {
