@@ -236,7 +236,32 @@ const FloorLayout = () => {
                         </Layer>
                     </Stage>
                 </motion.div>
-
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="mt-8 flex justify-center"
+                >
+                    <div className="flex space-x-4">
+                        <div className="flex items-center">
+                            <div className="w-4 h-4 rounded-sm mr-2" style={{ backgroundColor: colors.classroom }} />
+                            <span className="text-sm">Classroom</span>
+                        </div>
+                        <div className="flex items-center">
+                            <div className="w-4 h-4 rounded-sm mr-2" style={{ backgroundColor: colors.lab }} />
+                            <span className="text-sm">Lab</span>
+                        </div>
+                        <div className="flex items-center">
+                            <div className="w-4 h-4 rounded-sm mr-2" style={{ backgroundColor: colors.accent }} />
+                            <span className="text-sm">Office</span>
+                        </div>
+                        <div className="flex items-center">
+                            <div className="w-4 h-4 rounded-sm mr-2" style={{ backgroundColor: colors.selected }} />
+                            <span className="text-sm">Selected</span>
+                        </div>
+                    </div>
+                </motion.div>
+                <br></br>
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -286,31 +311,7 @@ const FloorLayout = () => {
                     </motion.div>
                 </motion.div>
 
-                <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="mt-8 flex justify-center"
-                >
-                    <div className="flex space-x-4">
-                        <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-sm mr-2" style={{ backgroundColor: colors.classroom }} />
-                            <span className="text-sm">Classroom</span>
-                        </div>
-                        <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-sm mr-2" style={{ backgroundColor: colors.lab }} />
-                            <span className="text-sm">Lab</span>
-                        </div>
-                        <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-sm mr-2" style={{ backgroundColor: colors.accent }} />
-                            <span className="text-sm">Office</span>
-                        </div>
-                        <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-sm mr-2" style={{ backgroundColor: colors.selected }} />
-                            <span className="text-sm">Selected</span>
-                        </div>
-                    </div>
-                </motion.div>
+                
             </div>
         </motion.div>
     );
