@@ -3,7 +3,7 @@ import givemedetails from '@/utils/givemedetails';
 
 export async function POST(req) {
   // const data = supabase(
-  //   process.env.NEXT_PUBLIC_NEXT_PUBLIC_SUPABASE_URL,
+  //   process.env.NEXT_PUBLIC_SUPABASE_URL,
   //   process.env.NEXT_PUBLIC_SUPABASE_API_KEY
   // );
   // const { data: bookingData, error } = await data
@@ -42,7 +42,7 @@ export async function POST(req) {
 
 
     // const data = SupabaseClient( 
-    //   process.env.NEXT_PUBLIC_NEXT_PUBLIC_SUPABASE_URL,
+    //   process.env.NEXT_PUBLIC_SUPABASE_URL,
     //   process.env.NEXT_PUBLIC_SUPABASE_API_KEY
     // );
     // const { data: bookingData, error } = await data
