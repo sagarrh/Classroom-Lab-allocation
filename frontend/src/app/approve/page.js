@@ -1,34 +1,33 @@
-"use client"
-import { SupabaseClient } from "@supabase/supabase-js";
+"use client";
+import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation"; // If using React Router
-
-// Initialize Supabase client outside of the component
-const supabase = new SupabaseClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_API_KEY
-);
+import { useSearchParams } from "next/navigation"; 
 
 function ApproveBooking() {
   const [message, setMessage] = useState("");
   const searchParams = useSearchParams();
   
   const bookingId = searchParams.get("booking_id");
-  const action = searchParams.get("action"); // "approve" or "reject"
+  const action = searchParams.get("action");
 
   useEffect(() => {
-    async function updateBookingStatus() {
-      if (!bookingId || !action) {
-        setMessage("Invalid request.");
-        return;
-      }
+    if (!bookingId || !action) {
+      setMessage("Invalid request.");
+      return;
+    }
 
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    );
+
+    async function updateBookingStatus() {
       try {
         const { error } = await supabase
           .from("bookings")
           .update({
             status: action,
-            approved_by:"Vinaya Maam"  // Ideally, replace this with dynamic user info
+            approved_by: "Vinaya Maam"
           })
           .eq("id", bookingId);
 
