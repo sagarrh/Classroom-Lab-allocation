@@ -13,6 +13,7 @@
     "@supabase/supabase-js": "^2.49.4",
     "@tailwindcss/vite": "^4.0.17",
     "canvas": "^3.1.0",
+    "framer-motion": "^12.6.2",
     "konva": "^9.3.20",
     "next": "^15.2.4",
     "nodemailer": "^6.10.0",
