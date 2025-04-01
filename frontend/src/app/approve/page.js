@@ -28,7 +28,7 @@ function ApproveBooking() {
           .from("bookings")
           .update({
             status: action,
-            approved_by: "hod@example.com"  // Ideally, replace this with dynamic user info
+            approved_by:"Vinaya Maam"  // Ideally, replace this with dynamic user info
           })
           .eq("id", bookingId);
 

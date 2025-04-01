@@ -1,10 +1,6 @@
 import { supabase } from "@/utils/supabaseClient";
 
 export async function GET(req) {
-
-    
-        
-
   try {
     const { searchParams } = new URL(req.url);
     const booking_id = searchParams.get("booking_id");

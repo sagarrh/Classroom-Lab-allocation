@@ -81,7 +81,8 @@ export default function TimeSlots({ roomId, selectedDate }) {
                     time_slot: slot,
                     status: "pending",
                     booked_by: username,
-                    reason: reason,
+                    reason: reason
+                    // approved_by: "Vinaya Maam"
                 }
             ]).select();
 
@@ -91,8 +92,24 @@ export default function TimeSlots({ roomId, selectedDate }) {
                 throw new Error("Admin email not set in environment variables.");
             }
             const bookingId = data?.[0]?.id;
+            const booked_by = data?.[0]?.booked_by;
+            const reason1 = data?.[0]?.reason;
+            const room_no = data?.[0]?.room_no;
+            const date = data?.[0]?.date;
+            const time_slot = data?.[0]?.time_slot;
+            const statusa = data?.[0]?.status;
+            const details = {
+                room_no: room_no,
+                date: date,
+                time_slot: time_slot,
+                booked_by: booked_by,
+                reason: reason1,
+                statusa: statusa,
+            };
+            console.log(data);
             if (bookingId) {
-                await requestApproval(bookingId,adminEmail );
+                // await requestApproval(bookingId,adminEmail, slot, username, reason, roomId, selectedDate);
+                await requestApproval(bookingId,adminEmail, details);
             }
 
             alert("Booking request submitted successfully!");
@@ -103,7 +120,7 @@ export default function TimeSlots({ roomId, selectedDate }) {
             setLoading(false);
         }
     };
-    async function requestApproval(bookingId, adminEmail) {
+    async function requestApproval(bookingId, adminEmail, details) {
         const res = await fetch("/api/sendMail", {
             method: "POST",
             headers: {
@@ -112,12 +129,22 @@ export default function TimeSlots({ roomId, selectedDate }) {
             body: JSON.stringify({
                 email: adminEmail,
                 booking_id: bookingId,
+                details: details,
             }),
         });
         
-        const data = await res.json();
         if (!res.ok) {
-            throw new Error(data.error);
+            const text = await res.text();
+            console.error('Error sending approval request:', text);
+            throw new Error(text || 'Failed to send approval request');
+        }
+
+        try {
+            const data = await res.json();
+            return data;
+        } catch (error) {
+            console.error('Invalid JSON response:', error);
+            return null;
         }
     }
 
@@ -135,7 +162,7 @@ export default function TimeSlots({ roomId, selectedDate }) {
                                 key={slot}
                                 onClick={() => handleBooking(slot)}
                                 className={`p-4 border rounded-lg cursor-pointer hover:opacity-80 ${
-                                    status === "approved"
+                                    status === "approve"
                                         ? "bg-green-300"
                                         : status === "pending"
                                         ? "bg-yellow-300"
