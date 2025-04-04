@@ -3,6 +3,14 @@
 import { useEffect, useState } from "react";
 import { SupabaseClient } from "@supabase/supabase-js";
 import credentials from "../time/credentials";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+  } from "@/components/ui/dialog";
 
 export default function TimeSlots({ roomId, selectedDate }) {
     const [bookings, setBookings] = useState([]);
