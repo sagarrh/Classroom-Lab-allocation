@@ -2,6 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import TimeSlots from "../components/TimeSlots";
 import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner"; 
 
 function TimePageContent() {
   const searchParams = useSearchParams();
@@ -22,7 +23,7 @@ function TimePageContent() {
 
 export default function TimePage() {
   return (
-    <Suspense fallback={<p>Loading...</p>}>
+    <Suspense fallback={<Spinner size="large" show />}>
       <TimePageContent />
     </Suspense>
   );

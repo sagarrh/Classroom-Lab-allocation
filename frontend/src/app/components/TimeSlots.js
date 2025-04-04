@@ -11,6 +11,7 @@ import {
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function TimeSlots({ roomId, selectedDate }) {
     const [bookings, setBookings] = useState([]);
@@ -160,7 +161,9 @@ export default function TimeSlots({ roomId, selectedDate }) {
         <div className="p-4">
             <h2 className="text-xl font-bold">Time Slots for {selectedDate}</h2>
             {loading ? (
-                <p>Loading...</p>
+                <div className="flex justify-center items-center mt-4">
+                    <Spinner size="large" show />
+                </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {generateTimeSlots().map((slot) => {
@@ -200,10 +203,7 @@ export default function TimeSlots({ roomId, selectedDate }) {
                         );
                     })}
                 </div>
-                
             )}
-            
         </div>
     );
-    
 }

@@ -2,6 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation"; 
+import { Spinner } from "@/components/ui/spinner";
 
 function ApproveBookingComponent() {
   const [message, setMessage] = useState("");
@@ -49,7 +50,13 @@ function ApproveBookingComponent() {
 
 export default function ApproveBooking() {
   return (
-    <Suspense fallback={<h1>Loading...</h1>}>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center min-h-screen">
+          <Spinner size="large" show />
+        </div>
+      }
+    >
       <ApproveBookingComponent />
     </Suspense>
   );
