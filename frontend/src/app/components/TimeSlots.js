@@ -17,7 +17,7 @@ export default function TimeSlots({ roomId, selectedDate }) {
     const [loading, setLoading] = useState(true);
     const supabase = new SupabaseClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+        process.env.NEXT_PUBLIC_SUPABASE_API_KEY
     );
 
     const generateTimeSlots = () => {
