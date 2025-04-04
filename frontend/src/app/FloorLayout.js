@@ -4,12 +4,13 @@ import { Stage, Layer, Rect, Text, Group } from 'react-konva';
 import { useRouter } from 'next/navigation';
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { motion } from 'framer-motion';
-import { DatePickerDemo } from './components/DatePicker'; // Import the DatePickerDemo component
+import { DatePickerDemo } from './components/DatePicker'; 
 
 const FloorLayout = () => {
     const router = useRouter();
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [hoveredRoom, setHoveredRoom] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(null);
 
     // Adjusted building dimensions for better proportions
     const buildingOutline = { x: 100, y: 50, width: 750, height: 600 };
@@ -126,13 +127,17 @@ const FloorLayout = () => {
     };
 
     const handleRoomHover = (room) => {
-        if (room.type !== 'office') { // Disable hover for HOD Cabin
+        if (room.type !== 'office') {
             setHoveredRoom(room);
         }
     };
 
     const handleRoomLeave = () => {
         setHoveredRoom(null);
+    };
+
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
     };
 
     const getRoomColor = (room) => {
@@ -161,7 +166,7 @@ const FloorLayout = () => {
                         IT Department Floor Layout
                     </h1>
                     <p className="text-lg text-gray-600">
-                        Select a room to view availability and schedule
+                        Select a room and date to view availability
                     </p>
                 </motion.div>
 
@@ -236,6 +241,7 @@ const FloorLayout = () => {
                         </Layer>
                     </Stage>
                 </motion.div>
+
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -261,23 +267,18 @@ const FloorLayout = () => {
                         </div>
                     </div>
                 </motion.div>
-                <br></br>
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                >
+
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-white rounded-xl shadow-md p-6">
                         <h3 className="text-xl font-semibold text-[#6D6875] mb-4">Selected Room Details</h3>
                         {selectedRoom ? (
                             <div className="space-y-3">
                                 <div className="flex items-center">
                                     <div className="w-3 h-3 rounded-full mr-2" 
-                                         style={{ 
-                                             backgroundColor: selectedRoom.type === 'lab' ? colors.lab : 
+                                        style={{ 
+                                            backgroundColor: selectedRoom.type === 'lab' ? colors.lab : 
                                                             selectedRoom.type === 'office' ? colors.accent : colors.classroom 
-                                         }} 
+                                        }} 
                                     />
                                     <p className="text-lg font-medium">{selectedRoom.label}</p>
                                 </div>
@@ -288,30 +289,29 @@ const FloorLayout = () => {
                         )}
                     </div>
 
-                    {/* Add the DatePickerDemo component here */}
-                    <motion.div 
-                        whileHover={{ scale: 1.02 }}
-                        className="flex items-center justify-center"
-                    >
-                        <DatePickerDemo /> {/* Insert DatePicker here */}
-                    </motion.div>
-
-                    <motion.div 
-                        whileHover={{ scale: 1.02 }}
-                        className="flex items-center justify-center"
-                    >
-                        <button 
-                            onClick={() => router.push(`/time?roomId=${selectedRoom?.id}`)} 
-                            className="w-full px-8 py-4 bg-gradient-to-r from-[#B5EAD7] to-[#C7CEEA] text-[#2D3748] font-semibold flex items-center justify-center gap-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={!selectedRoom}
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-xl shadow-md p-6 relative overflow-hidden">
+                            <h3 className="text-xl font-semibold text-[#6D6875] mb-4">Select Date</h3>
+                            <div className="w-full">
+                                <DatePickerDemo onChange={handleDateChange} />
+                            </div>
+                        </div>
+                        
+                        <motion.div 
+                            whileHover={{ scale: 1.02 }}
+                            className="flex items-center justify-center"
                         >
-                            <span>Check Availability</span>
-                            <ArrowRightIcon className="w-5 h-5" />
-                        </button>
-                    </motion.div>
-                </motion.div>
-
-                
+                            <button 
+                                onClick={() => router.push(`/time?roomId=${selectedRoom?.id}&date=${selectedDate?.toISOString()}`)} 
+                                className="w-full px-8 py-4 bg-gradient-to-r from-[#B5EAD7] to-[#C7CEEA] text-[#2D3748] font-semibold flex items-center justify-center gap-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!selectedRoom || !selectedDate}
+                            >
+                                <span>Check Availability</span>
+                                <ArrowRightIcon className="w-5 h-5" />
+                            </button>
+                        </motion.div>
+                    </div>
+                </div>
             </div>
         </motion.div>
     );
