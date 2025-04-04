@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Stage, Layer, Rect, Text, Group } from 'react-konva';
 import { useRouter } from 'next/navigation';
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
@@ -138,7 +138,12 @@ const FloorLayout = () => {
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
+        console.log("Selected Date:", date);
     };
+    useEffect(() => {
+        console.log("Current selectedDate:", selectedDate);
+    }, [selectedDate]);
+
 
     const getRoomColor = (room) => {
         if (selectedRoom && selectedRoom.id === room.id) return colors.selected;
@@ -302,13 +307,19 @@ const FloorLayout = () => {
                             className="flex items-center justify-center"
                         >
                             <button 
-                                onClick={() => router.push(`/time?roomId=${selectedRoom?.id}&date=${selectedDate?.toISOString()}`)} 
+                                onClick={() => {
+                                    if (selectedRoom && selectedDate) {
+                                    // Format date as YYYY-MM-DD without time/timezone
+                                    const formattedDate = selectedDate.toISOString().split('T')[0];
+                                    router.push(`/time?roomId=${selectedRoom.id}&date=${formattedDate}`);
+                                    }
+                                }}
                                 className="w-full px-8 py-4 bg-gradient-to-r from-[#B5EAD7] to-[#C7CEEA] text-[#2D3748] font-semibold flex items-center justify-center gap-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={!selectedRoom || !selectedDate}
-                            >
+                                >
                                 <span>Check Availability</span>
                                 <ArrowRightIcon className="w-5 h-5" />
-                            </button>
+                                </button>
                         </motion.div>
                     </div>
                 </div>

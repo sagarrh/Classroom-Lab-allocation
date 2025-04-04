@@ -1,5 +1,4 @@
 "use client";
-
 import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -13,9 +12,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export function DatePickerDemo() {
+export function DatePickerDemo({ onChange }) {  // Add onChange prop
   const [date, setDate] = React.useState();
-  const today = new Date(); // Get today's date
+  const today = new Date();
+
+  const handleDateSelect = (selectedDate) => {
+    setDate(selectedDate);
+    onChange(selectedDate);  // Call the parent's callback
+  };
 
   return (
     <Popover>
@@ -23,7 +27,7 @@ export function DatePickerDemo() {
         <Button
           variant={"outline"}
           className={cn(
-            "w-[450px] justify-start text-left font-normal text-lg py-7",
+            "w-full justify-start text-left font-normal text-lg py-7",
             !date && "text-muted-foreground"
           )}
         >
@@ -35,9 +39,9 @@ export function DatePickerDemo() {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={handleDateSelect}  // Use our handler
           initialFocus
-          fromDate={today} // Prevents selecting past dates
+          fromDate={today}
         />
       </PopoverContent>
     </Popover>
