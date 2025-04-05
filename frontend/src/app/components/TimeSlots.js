@@ -18,7 +18,9 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+    const [viewDialogOpen, setViewDialogOpen] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState("");
+    const [selectedBooking, setSelectedBooking] = useState(null);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [reason, setReason] = useState("");
@@ -41,7 +43,7 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
 
     const generateTimeSlots = () => {
         const slots = [];
-        for (let hour = 7; hour < 18; hour++) {
+        for (let hour = 8; hour < 18; hour++) {
             slots.push(`${hour}:00 - ${hour + 1}:00`);
         }
         return slots;
@@ -52,7 +54,7 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
             setLoading(true);
             const { data, error } = await supabase
                 .from("bookings")
-                .select("time_slot, status")
+                .select("time_slot, status, reason, booked_by,is_recurring,class")
                 .eq("room_no", roomId)
                 .eq("date", selectedDate);
 
@@ -65,17 +67,57 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
         }
     }
 
-    const isBooked = (slot) => {
-        const booking = bookings.find((b) => b.time_slot === slot);
-        return booking ? booking.status : "vacant";
+    const timeToMinutes = (timeStr) => {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return hours * 60 + minutes;
+    };
+
+    const isSlotBooked = (slot) => {
+        const [slotStartTime, slotEndTime] = slot.split(' - ');
+        const slotStart = timeToMinutes(slotStartTime);
+        const slotEnd = timeToMinutes(slotEndTime);
+
+        return bookings.some(booking => {
+            const [bookingStartTime, bookingEndTime] = booking.time_slot.split(' - ');
+            const bookingStart = timeToMinutes(bookingStartTime);
+            const bookingEnd = timeToMinutes(bookingEndTime);
+
+            return (
+                (slotStart >= bookingStart && slotStart < bookingEnd) ||
+                (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
+                (slotStart <= bookingStart && slotEnd >= bookingEnd)
+            );
+        });
+    };
+
+    const getBookingForSlot = (slot) => {
+        const [slotStartTime, slotEndTime] = slot.split(' - ');
+        const slotStart = timeToMinutes(slotStartTime);
+        const slotEnd = timeToMinutes(slotEndTime);
+
+        return bookings.find(booking => {
+            const [bookingStartTime, bookingEndTime] = booking.time_slot.split(' - ');
+            const bookingStart = timeToMinutes(bookingStartTime);
+            const bookingEnd = timeToMinutes(bookingEndTime);
+
+            return (
+                (slotStart >= bookingStart && slotStart < bookingEnd) ||
+                (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
+                (slotStart <= bookingStart && slotEnd >= bookingEnd)
+            );
+        }) || { status: "vacant" };
     };
 
     const handleSlotClick = (slot) => {
-        const status = isBooked(slot);
-        if (status !== "vacant") {
-            alert("This slot is already booked or pending approval");
+        const booking = getBookingForSlot(slot);
+        
+        if (booking.status !== "vacant") {
+            setSelectedSlot(slot);
+            setSelectedBooking(booking);
+            setViewDialogOpen(true);
             return;
         }
+        
         setSelectedSlot(slot);
         setBookingDialogOpen(true);
     };
@@ -168,19 +210,22 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {generateTimeSlots().map((slot) => {
-                        const status = isBooked(slot);
+                        const isBooked = isSlotBooked(slot);
+                        const booking = getBookingForSlot(slot);
+                        const status = booking.status;
+                        
                         return (
                             <div
                                 key={slot}
                                 onClick={() => handleSlotClick(slot)}
                                 className={`p-4 border rounded-lg cursor-pointer hover:opacity-80 transition-all ${
-                                    status === "approved"
+                                    !isBooked
+                                        ? "bg-gray-100 border-gray-300"
+                                        : status === "approved"
                                         ? "bg-green-200 border-green-400"
                                         : status === "pending"
                                         ? "bg-yellow-200 border-yellow-400"
-                                        : status === "occupied"
-                                        ? "bg-red-200 border-red-400"
-                                        : "bg-gray-100 border-gray-300"
+                                        : "bg-red-200 border-red-400"
                                 }`}
                             >
                                 <p className="font-semibold text-center">{slot}</p>
@@ -188,17 +233,20 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
                                     Status:{" "}
                                     <span
                                         className={`font-bold ${
-                                            status === "approved" 
+                                            !isBooked
+                                                ? "text-gray-700"
+                                                : status === "approved" 
                                                 ? "text-green-700"
                                                 : status === "pending"
                                                 ? "text-yellow-700"
-                                                : status === "occupied"
-                                                ? "text-red-700"
-                                                : "text-gray-700"
+                                                : "text-red-700"
                                         }`}
                                     >
-                                        {status === "vacant" ? "Available" : status}
+                                        {!isBooked ? "Available" : status}
                                     </span>
+                                </p>
+                                <p className="mt-2 text-sm text-center text-gray-600 h-6">
+                                    {isBooked ? `Reason: ${booking.reason || "-"}` : "Reason: -"}
                                 </p>
                             </div>
                         );
@@ -206,6 +254,71 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
                 </div>
             )}
 
+            {/* View Booking Dialog */}
+            <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Booking Details</DialogTitle>
+                        <DialogDescription>
+                            View details of this scheduled class
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    {selectedBooking && (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-500">Time Slot</p>
+                                    <p className="font-medium">{selectedBooking.time_slot}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-gray-500">Status</p>
+                                    <p className="font-medium">
+                                        <span className={`inline-block px-2 py-1 rounded ${
+                                            selectedBooking.status === "approved" 
+                                                ? "bg-green-100 text-green-800"
+                                                : selectedBooking.status === "pending"
+                                                ? "bg-yellow-100 text-yellow-800"
+                                                : "bg-red-100 text-red-800"
+                                        }`}>
+                                            {selectedBooking.status}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <p className="text-sm font-medium text-gray-500">Teacher</p>
+                                <p className="font-medium">{selectedBooking.booked_by || "Not specified"}</p>
+                            </div>
+                            
+                            <div>
+                                <p className="text-sm font-medium text-gray-500">Class</p>
+                                <p className="font-medium">{selectedBooking.class || "Not specified"}</p>
+                            </div>
+                            
+                            <div>
+                                <p className="text-sm font-medium text-gray-500">Reason</p>
+                                <p className="font-medium">{selectedBooking.reason || "Regular class schedule"}</p>
+                            </div>
+                            
+                            {selectedBooking.is_recurring && (
+                                <div className="mt-2 p-2 bg-blue-50 rounded">
+                                    <p className="text-xs text-blue-600">This is a recurring weekly booking</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <DialogFooter>
+                        <Button onClick={() => setViewDialogOpen(false)}>
+                            Close
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Booking Dialog */}
             <Dialog open={bookingDialogOpen} onOpenChange={setBookingDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
