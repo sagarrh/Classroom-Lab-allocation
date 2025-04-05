@@ -1,25 +1,20 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { SupabaseClient } from "@supabase/supabase-js";
 import credentials from "../time/credentials";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-  } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 
-export default function TimeSlots({ roomId, selectedDate }) {
+export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const supabase = new SupabaseClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL,
         process.env.NEXT_PUBLIC_SUPABASE_API_KEY
     );
+
+    useEffect(() => {
+        fetchBookings();
+    }, [roomId, selectedDate]);
 
     const generateTimeSlots = () => {
         const slots = [];
@@ -28,10 +23,6 @@ export default function TimeSlots({ roomId, selectedDate }) {
         }
         return slots;
     };
-
-    useEffect(() => {
-        fetchBookings();
-    }, [roomId, selectedDate]);
 
     async function fetchBookings() {
         try {
@@ -91,34 +82,26 @@ export default function TimeSlots({ roomId, selectedDate }) {
                     status: "pending",
                     booked_by: username,
                     reason: reason
-                    // approved_by: "Vinaya Maam"
                 }
             ]).select();
 
             if (error) throw error;
+            
             const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
             if (!adminEmail) {
                 throw new Error("Admin email not set in environment variables.");
             }
+
             const bookingId = data?.[0]?.id;
-            const booked_by = data?.[0]?.booked_by;
-            const reason1 = data?.[0]?.reason;
-            const room_no = data?.[0]?.room_no;
-            const date = data?.[0]?.date;
-            const time_slot = data?.[0]?.time_slot;
-            const statusa = data?.[0]?.status;
-            const details = {
-                room_no: room_no,
-                date: date,
-                time_slot: time_slot,
-                booked_by: booked_by,
-                reason: reason1,
-                statusa: statusa,
-            };
-            console.log(data);
             if (bookingId) {
-                // await requestApproval(bookingId,adminEmail, slot, username, reason, roomId, selectedDate);
-                await requestApproval(bookingId,adminEmail, details);
+                await requestApproval(bookingId, adminEmail, {
+                    room_no: roomId,
+                    date: selectedDate,
+                    time_slot: slot,
+                    booked_by: username,
+                    reason: reason,
+                    status: "pending"
+                });
             }
 
             alert("Booking request submitted successfully!");
@@ -129,37 +112,35 @@ export default function TimeSlots({ roomId, selectedDate }) {
             setLoading(false);
         }
     };
-    async function requestApproval(bookingId, adminEmail, details) {
-        const res = await fetch("/api/sendMail", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: adminEmail,
-                booking_id: bookingId,
-                details: details,
-            }),
-        });
-        
-        if (!res.ok) {
-            const text = await res.text();
-            console.error('Error sending approval request:', text);
-            throw new Error(text || 'Failed to send approval request');
-        }
 
+    async function requestApproval(bookingId, adminEmail, details) {
         try {
-            const data = await res.json();
-            return data;
+            const res = await fetch("/api/sendMail", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: adminEmail,
+                    booking_id: bookingId,
+                    details: details,
+                }),
+            });
+            
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || 'Failed to send approval request');
+            }
+            return await res.json();
         } catch (error) {
-            console.error('Invalid JSON response:', error);
-            return null;
+            console.error('Error sending approval request:', error);
+            throw error;
         }
     }
 
     return (
         <div className="p-4">
-            <h2 className="text-xl font-bold">Time Slots for {selectedDate}</h2>
+            <h2 className="text-xl font-bold mb-4">Time Slots for {formattedDate}</h2>
             {loading ? (
                 <div className="flex justify-center items-center mt-4">
                     <Spinner size="large" show />
@@ -172,18 +153,18 @@ export default function TimeSlots({ roomId, selectedDate }) {
                             <div
                                 key={slot}
                                 onClick={() => handleBooking(slot)}
-                                className={`p-4 border rounded-lg cursor-pointer hover:opacity-80 ${
-                                    status === "approve"
-                                        ? "bg-green-300"
+                                className={`p-4 border rounded-lg cursor-pointer hover:opacity-80 transition-all ${
+                                    status === "approved"
+                                        ? "bg-green-200 border-green-400"
                                         : status === "pending"
-                                        ? "bg-yellow-300"
+                                        ? "bg-yellow-200 border-yellow-400"
                                         : status === "occupied"
-                                        ? "bg-red-300"
-                                        : "bg-gray-200"
-                                } flex flex-col justify-center items-center text-center`}
+                                        ? "bg-red-200 border-red-400"
+                                        : "bg-gray-100 border-gray-300"
+                                }`}
                             >
-                                <p className="font-semibold">{slot}</p>
-                                <p>
+                                <p className="font-semibold text-center">{slot}</p>
+                                <p className="text-center mt-2">
                                     Status:{" "}
                                     <span
                                         className={`font-bold ${
@@ -196,7 +177,7 @@ export default function TimeSlots({ roomId, selectedDate }) {
                                                 : "text-gray-700"
                                         }`}
                                     >
-                                        {status === "vacant" ? "Vacant" : status}
+                                        {status === "vacant" ? "Available" : status}
                                     </span>
                                 </p>
                             </div>
