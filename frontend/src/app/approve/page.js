@@ -35,7 +35,7 @@ function ApproveBookingComponent() {
         if (error) {
           setMessage("Error updating booking: " + error.message);
         } else {
-          setMessage(`Booking ${action === "approve" ? "approved" : "rejected"} successfully!`);
+          setMessage(`Booking ${action === "approved" ? "approved" : "rejected"} successfully!`);
         }
       } catch (err) {
         setMessage("Network error: " + err.message);

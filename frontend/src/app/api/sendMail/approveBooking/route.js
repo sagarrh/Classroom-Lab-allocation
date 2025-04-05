@@ -10,7 +10,7 @@ export async function GET(req) {
       return new Response(JSON.stringify({ error: "Missing parameters" }), { status: 400 });
     }
 
-    const newStatus = action === "approve" ? "approved" : "rejected";
+    const newStatus = action === "approved" ? "approved" : "rejected";
     const { error } = await supabase
       .from("bookings")
       .update({ status: newStatus })
