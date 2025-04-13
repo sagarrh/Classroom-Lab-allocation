@@ -46,7 +46,7 @@ const FloorLayout = () => {
     const roomHeight = 120;
     const labWidth = 200;
     const labHeight = 100;
-    const gap = 30; // Uniform gap between rooms and corridor
+    const  gap  =  30; // Uniform gap between rooms and corridor
 
     // Define classrooms (left side of corridor)
     const classrooms = [
