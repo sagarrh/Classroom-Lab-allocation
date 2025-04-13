@@ -19,7 +19,7 @@ function ApproveBookingComponent() {
 
   useEffect(() => {
     if (!bookingId || !action) {
-      setMessage("Invalid request parameters.");
+      setMessage(" Invalid request parameters.");
       setIsLoading(false);
       setIsSuccess(false);
       return;
