@@ -27,7 +27,7 @@ export function DatePickerDemo({ onChange }) {  // Add onChange prop
         <Button
           variant={"outline"}
           className={cn(
-            "w-full justify-start text-left font-normal text-lg py-7",
+            "w-full  justify-start text-left font-normal text-lg py-7",
             !date && "text-muted-foreground"
           )}
         >
