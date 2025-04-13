@@ -2,10 +2,10 @@
 import { useSearchParams } from "next/navigation";
 import TimeSlots from "../components/TimeSlots";
 import { Suspense } from "react";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner  } from "@/components/ui/spinner";
 
 function TimePageContent() {
-  const searchParams = useSearchParams();
+  const   searchParams = useSearchParams();
   const roomId = searchParams.get("roomId");
   const dateParam = searchParams.get("date");
 
