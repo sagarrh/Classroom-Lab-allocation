@@ -149,7 +149,7 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
             
             const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
             if (!adminEmail) {
-                throw new Error("Admin email not set in environment variables.");
+                throw new Error("Adminem ail not set in environment variables.");
             }
 
             const bookingId = data?.[0]?.id;
