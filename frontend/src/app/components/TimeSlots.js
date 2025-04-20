@@ -41,10 +41,13 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
         setBookingStep(1);
     };
 
-    const generateTimeSlots = () => {
+     const generateTimeSlots = () => {
         const slots = [];
         for (let hour = 8; hour < 18; hour++) {
-            slots.push(`${hour}:00 - ${hour + 1}:00`);
+            // Add full hour slot
+            slots.push(`${hour}:00 - ${hour}:30`);
+            // Add half hour slot
+            slots.push(`${hour}:30 - ${hour + 1}:00`);
         }
         return slots;
     };
@@ -68,6 +71,7 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
     }
 
     const timeToMinutes = (timeStr) => {
+        if (!timeStr || typeof timeStr !== 'string') return 0;
         const [hours, minutes] = timeStr.split(':').map(Number);
         return hours * 60 + minutes;
     };
@@ -107,6 +111,17 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
             );
         }) || { status: "vacant" };
     };
+    // const generateTimeSlots = () => {
+    //     const slots = [];
+    //     for (let hour = 8; hour < 18; hour++) {
+    //         // Add full hour slot
+    //         slots.push(`${hour}:00 - ${hour}:30`);
+    //         // Add half hour slot
+    //         slots.push(`${hour}:30 - ${hour + 1}:00`);
+    //     }
+    //     return slots;
+    // };
+    
 
     const handleSlotClick = (slot) => {
         const booking = getBookingForSlot(slot);
@@ -144,7 +159,7 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
                     reason: reason
                 }
             ]).select();
-
+            // console.log(data    )
             if (error) throw error;
             
             const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
@@ -153,6 +168,7 @@ export default function TimeSlots({ roomId, selectedDate, formattedDate }) {
             }
 
             const bookingId = data?.[0]?.id;
+            // console.log(bookingId)
             if (bookingId) {
                 await requestApproval(bookingId, adminEmail, {
                     room_no: roomId,

@@ -10,9 +10,11 @@
 !.yarn/releases
 !.yarn/versions
 
+/timetable_processor/venv
+/timetable_processor/__pycache__
 # testing
 /coverage
-
+/venv
 # next.js
 /.next/
 /out/
